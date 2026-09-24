@@ -6,7 +6,10 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+/* Default Main Transparent Overlay Document */
+html:not(.settings-window),
+body:not(.settings-window),
+#root:not(.settings-window) {
   width: 100vw;
   height: 100vh;
   margin: 0;
@@ -15,6 +18,22 @@ html, body, #root {
   overflow: hidden;
   user-select: none;
   pointer-events: none;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Settings Window Document (Full Native Interactivity) */
+html.settings-window,
+body.settings-window,
+.settings-window #root {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #0B1220 !important;
+  overflow: hidden;
+  user-select: auto;
+  pointer-events: auto !important;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }

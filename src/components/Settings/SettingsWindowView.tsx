@@ -59,6 +59,20 @@ export const SettingsWindowView: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [charmCategoryFilter, setCharmCategoryFilter] = useState<string>('all');
 
+  // Ensure Settings Window document and root have full pointer-events interactivity
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.add('settings-window');
+      document.body.classList.add('settings-window');
+      document.documentElement.style.pointerEvents = 'auto';
+      document.body.style.pointerEvents = 'auto';
+      const root = document.getElementById('root');
+      if (root) {
+        root.style.pointerEvents = 'auto';
+      }
+    }
+  }, []);
+
   // Sync settings update to main overlay
   const handleUpdate = (partial: Partial<AppSettings>) => {
     updateSettings(partial);

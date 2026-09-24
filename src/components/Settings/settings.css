@@ -10,6 +10,11 @@
   overflow: hidden;
   user-select: none;
   box-sizing: border-box;
+  pointer-events: auto !important;
+}
+
+.settings-window-container * {
+  pointer-events: auto;
 }
 
 /* 1. Sidebar */
