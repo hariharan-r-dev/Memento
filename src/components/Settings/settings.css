@@ -1,0 +1,418 @@
+/* Lucky Charm Desktop Settings Stylesheet — Modern Dark Preferences Theme */
+
+.settings-window-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0B1220 !important;
+  color: #F8FAFC;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+/* 1. Sidebar */
+.settings-sidebar {
+  width: 210px;
+  min-width: 210px;
+  max-width: 210px;
+  height: 100%;
+  background-color: #080D1A;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px 12px 12px;
+  box-sizing: border-box;
+}
+
+.settings-nav-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #94A3B8;
+  background: transparent;
+  border: 1px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all 120ms ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.settings-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: #F1F5F9;
+}
+
+.settings-nav-item.active {
+  background-color: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #FBBF24;
+  font-weight: 600;
+}
+
+.settings-nav-item .nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: #64748B;
+  flex-shrink: 0;
+  transition: color 120ms ease;
+}
+
+.settings-nav-item:hover .nav-icon {
+  color: #CBD5E1;
+}
+
+.settings-nav-item.active .nav-icon {
+  color: #F59E0B;
+}
+
+.settings-sidebar-brand {
+  padding: 12px 8px 4px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+/* 2. Content Pane */
+.settings-content-pane {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #0B1220;
+  padding: 28px 36px 40px 36px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.settings-page-header {
+  margin-bottom: 22px;
+}
+
+.settings-page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F8FAFC;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.settings-page-desc {
+  font-size: 13px;
+  color: #94A3B8;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.settings-section {
+  margin-bottom: 22px;
+}
+
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748B;
+  margin-bottom: 8px;
+}
+
+/* Category Filter Pills */
+.settings-tab-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 4px;
+}
+
+.settings-tab-pill {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #94A3B8;
+  background: #131C2E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 120ms ease;
+  white-space: nowrap;
+}
+
+.settings-tab-pill:hover {
+  background: #1A253C;
+  color: #F1F5F9;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.settings-tab-pill.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #F59E0B;
+  color: #FBBF24;
+  font-weight: 600;
+}
+
+.settings-card {
+  background: #131C2E;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 16px;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-row-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #F1F5F9;
+  line-height: 1.3;
+}
+
+.settings-row-desc {
+  font-size: 12px;
+  color: #94A3B8;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.settings-row-control {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* 3. Controls */
+.settings-toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 9999px;
+  background-color: #1E293B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  outline: none;
+}
+
+.settings-toggle.checked {
+  background-color: #D97706;
+  border-color: #F59E0B;
+}
+
+.settings-toggle-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background-color: #F8FAFC;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(0);
+}
+
+.settings-toggle.checked .settings-toggle-thumb {
+  transform: translateX(18px);
+}
+
+.settings-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 210px;
+}
+
+.settings-slider-input {
+  flex: 1;
+  height: 5px;
+  background: #1E293B;
+  border-radius: 4px;
+  appearance: none;
+  cursor: pointer;
+  accent-color: #F59E0B;
+  outline: none;
+}
+
+.settings-slider-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FDE68A;
+  min-width: 48px;
+  text-align: right;
+}
+
+.settings-select {
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #F1F5F9;
+  background-color: #162035;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 120ms;
+}
+
+.settings-select:focus {
+  border-color: #F59E0B;
+}
+
+.settings-button {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #E2E8F0;
+  background: #1A253A;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-button:hover {
+  background: #24324D;
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.settings-button-danger {
+  color: #F87171;
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.settings-button-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #FCA5A5;
+}
+
+/* 4. 2-Column Item Grids (Charms & Pets) */
+.settings-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.settings-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 10px 10px 10px;
+  background: #131C2E;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  position: relative;
+  text-align: left;
+  outline: none;
+}
+
+.settings-item-card:hover {
+  background: #172338;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.settings-item-card.selected {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 1px #F59E0B;
+}
+
+.settings-item-card .card-preview {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.settings-item-card .card-footer {
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-item-card.selected .card-footer {
+  border-top-color: rgba(245, 158, 11, 0.25);
+}
+
+.settings-item-card .card-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #F1F5F9;
+}
+
+.settings-item-card.selected .card-name {
+  color: #FCD34D;
+}
+
+.settings-item-card .card-tag {
+  font-size: 10.5px;
+  color: #94A3B8;
+  margin-top: 1px;
+}
+
+.settings-item-card .card-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background-color: #D97706;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+}
