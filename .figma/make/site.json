@@ -1,5 +1,6 @@
 {
-  "description": "Streamline project management with intuitive tools for collaboration, task tracking, and progress monitoring, designed for teams and businesses.",
+  "title": "Memento — Tactile Desktop Companion",
+  "description": "A tactile talisman desktop companion that hangs from your screen bezel with real-time physics.",
   "robots": {
     "index": false
   },

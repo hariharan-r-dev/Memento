@@ -120,7 +120,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: '#D97706', fontWeight: 'bold', fontSize: '13px' }}>✦</span>
             <span style={{ fontWeight: 600, fontSize: '13px', color: '#111827' }}>
-              Lucky Charm Preferences
+              Memento Preferences
             </span>
           </div>
           <button
@@ -175,7 +175,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="settings-page-header">
                   <h1 className="settings-page-title">General</h1>
                   <p className="settings-page-desc">
-                    Control how Lucky Charm behaves on your desktop.
+                    Control how Memento behaves on your desktop.
                   </p>
                 </div>
 
@@ -202,7 +202,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   <SettingRow
                     label="Launch on Startup"
-                    description="Start Lucky Charm automatically when Windows boots."
+                    description="Start Memento automatically when Windows boots."
                   >
                     <SettingToggle
                       checked={settings.launchAtStartup}
@@ -531,7 +531,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   <SettingRow
                     label="Ritual Sound"
-                    description="Auspicious bell chime during Lucky Ritual."
+                    description="Auspicious bell chime during Daily Ritual."
                   >
                     <SettingToggle
                       checked={settings.ritualSound && settings.ritualSoundEnabled}
@@ -558,13 +558,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="settings-page-header">
                   <h1 className="settings-page-title">Rituals</h1>
                   <p className="settings-page-desc">
-                    Configure the visual and audio effects used during Lucky Ritual.
+                    Configure the visual and audio effects used during Daily Ritual.
                   </p>
                 </div>
 
-                <SettingsSection title="Lucky Ritual Settings">
+                <SettingsSection title="Ritual Settings">
                   <SettingRow
-                    label="Lucky Ritual"
+                    label="Ritual"
                     description="Trigger fortune blessing on charm double-click."
                   >
                     <SettingToggle
@@ -646,7 +646,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="settings-page-header">
                   <h1 className="settings-page-title">Shortcut</h1>
                   <p className="settings-page-desc">
-                    Configure the global hotkey to toggle Lucky Charm visibility.
+                    Configure the global hotkey to toggle Memento visibility.
                   </p>
                 </div>
 
@@ -698,10 +698,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </p>
                 </div>
 
-                <SettingsSection title="Lucky Charm">
+                <SettingsSection title="Memento">
                   <SettingRow
                     label="Version"
-                    description="Lucky Charm Desktop"
+                    description="Memento Desktop"
                   >
                     <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '12px', fontWeight: 600, color: '#374151' }}>
                       0.1.0

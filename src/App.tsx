@@ -216,7 +216,7 @@ export const App: React.FC = () => {
   ]);
 
   useEffect(() => {
-    console.log('[Lucky Charm Startup Diagnostic]', {
+    console.log('[Memento Startup Diagnostic]', {
       window: {
         width: typeof window !== 'undefined' ? window.innerWidth : 1920,
         height: typeof window !== 'undefined' ? window.innerHeight : 1080,

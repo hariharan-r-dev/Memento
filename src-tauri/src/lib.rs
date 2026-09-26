@@ -293,7 +293,7 @@ fn open_settings_window(app: tauri::AppHandle, tab: Option<String>) -> Result<()
 
   let url = tauri::WebviewUrl::App(format!("index.html?window=settings&tab={}", tab_name).into());
   let win = tauri::WebviewWindowBuilder::new(&app, "settings", url)
-    .title("Lucky Charm Preferences")
+    .title("Memento Preferences")
     .initialization_script("window.__MEMENTO_WINDOW_MODE__ = 'settings';")
     .inner_size(860.0, 600.0)
     .min_inner_size(780.0, 520.0)
@@ -616,7 +616,7 @@ pub fn run() {
       }
     })
     .setup(move |app| {
-      let boot_log = std::env::temp_dir().join("lucky_charm_boot.log");
+      let boot_log = std::env::temp_dir().join("memento_boot.log");
       let append_log = |msg: &str| {
         use std::io::Write;
         if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&boot_log) {
@@ -713,7 +713,7 @@ pub fn run() {
       Ok(())
     })
     .on_window_event(|window, event| {
-      let boot_log = std::env::temp_dir().join("lucky_charm_boot.log");
+      let boot_log = std::env::temp_dir().join("memento_boot.log");
       if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&boot_log) {
         use std::io::Write;
         let _ = writeln!(f, "Window [{}] event: {:?}", window.label(), event);

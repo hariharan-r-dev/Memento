@@ -1,4 +1,4 @@
-# Memento — Interactive Desktop Lucky Charms & Companions
+# Memento — Interactive Desktop Companions & Talismans
 
 <div align="center">
 
@@ -129,8 +129,8 @@ powershell -ExecutionPolicy Bypass -File "scripts/build_prod.ps1"
 ```
 
 The output binaries will be packaged into:
-- **Standalone EXE**: `release-bin/Lucky-Charm.exe`
-- **NSIS Installer**: `release-bin/Lucky-Charm-Setup.exe`
+- **Standalone EXE**: `release-bin/Memento.exe`
+- **NSIS Installer**: `release-bin/Memento-Setup.exe`
 
 ---
 

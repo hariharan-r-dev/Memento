@@ -97,7 +97,7 @@ pub fn setup_window<R: Runtime>(window: &WebviewWindow<R>, state: Arc<HitTestSta
         MONITOR_RUNNING.store(true, Ordering::SeqCst);
 
         std::thread::spawn(move || {
-            let log_path = std::env::temp_dir().join("lucky_charm_monitor.log");
+            let log_path = std::env::temp_dir().join("memento_monitor.log");
             let append_log = |msg: &str| {
                 use std::io::Write;
                 if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&log_path) {

@@ -29,7 +29,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         {/* Title */}
         <div>
           <h2 className="text-base font-bold text-slate-100 tracking-tight">
-            Meet your little lucky charm.
+            Meet your little companion.
           </h2>
           <p className="text-xs text-slate-300 mt-2 leading-relaxed px-2">
             It lives quietly on your screen.

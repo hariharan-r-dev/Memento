@@ -57,7 +57,7 @@ class RitualEngine {
 
     // 6. Send optional desktop notification
     if (notificationsEnabled) {
-      sendDesktopNotification(`Lucky Charm ✦ ${charm.name}`, fortune);
+      sendDesktopNotification(`Memento ✦ ${charm.name}`, fortune);
     }
 
     // 7. Deterministic cleanup after ritual duration
