@@ -4,7 +4,7 @@ use tauri::{PhysicalPosition, PhysicalSize, Position, Runtime, Size, WebviewWind
 use windows_sys::Win32::Foundation::{HWND, POINT, RECT};
 use windows_sys::Win32::UI::HiDpi::GetDpiForWindow;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    FindWindowW, GetCursorPos, GetWindowLongPtrW, GetWindowRect, IsWindowVisible,
+    GetCursorPos, GetWindowLongPtrW, GetWindowRect, IsIconic, IsWindow, IsWindowVisible,
     SetWindowLongPtrW, GWL_EXSTYLE, WS_EX_TRANSPARENT,
 };
 
@@ -22,6 +22,8 @@ pub struct HitTestState {
     pub has_pet: AtomicBool,
     pub is_dragging: AtomicBool,
     pub is_modal_open: AtomicBool,
+    pub activation_hwnd: std::sync::atomic::AtomicIsize,
+    pub settings_hwnd: std::sync::atomic::AtomicIsize,
 }
 
 impl Default for HitTestState {
@@ -40,6 +42,8 @@ impl Default for HitTestState {
             has_pet: AtomicBool::new(false),
             is_dragging: AtomicBool::new(false),
             is_modal_open: AtomicBool::new(false),
+            activation_hwnd: std::sync::atomic::AtomicIsize::new(0),
+            settings_hwnd: std::sync::atomic::AtomicIsize::new(0),
         }
     }
 }
@@ -84,7 +88,6 @@ pub fn setup_window<R: Runtime>(window: &WebviewWindow<R>, state: Arc<HitTestSta
 
     if let Ok(raw_hwnd) = window.hwnd() {
         let hwnd_val = raw_hwnd.0 as isize;
-        let window_clone = window.clone();
 
         // Start as click-through immediately on launch
         let hwnd = hwnd_val as HWND;
@@ -181,22 +184,55 @@ pub fn setup_window<R: Runtime>(window: &WebviewWindow<R>, state: Arc<HitTestSta
                     ));
                 }
 
-                // Check if cursor is over the native Settings window ("Lucky Charm Preferences")
-                let settings_title: Vec<u16> = "Lucky Charm Preferences\0".encode_utf16().collect();
-                let settings_hwnd = unsafe { FindWindowW(std::ptr::null(), settings_title.as_ptr()) };
-                if !settings_hwnd.is_null() && unsafe { IsWindowVisible(settings_hwnd) } != 0 {
-                    let mut settings_rect = RECT { left: 0, top: 0, right: 0, bottom: 0 };
-                    if unsafe { GetWindowRect(settings_hwnd, &mut settings_rect) } != 0 {
-                        if pt.x >= settings_rect.left
-                            && pt.x < settings_rect.right
-                            && pt.y >= settings_rect.top
-                            && pt.y < settings_rect.bottom
-                        {
-                            if currently_interactive {
-                                currently_interactive = false;
-                                set_click_through_native(hwnd, true);
+                // Check if main window itself is hidden
+                if unsafe { IsWindowVisible(hwnd) } == 0 {
+                    if currently_interactive {
+                        currently_interactive = false;
+                        set_click_through_native(hwnd, true);
+                    }
+                    continue;
+                }
+
+                // Check if cursor is over the native Activation window (obtained directly via Tauri WebviewWindow HWND)
+                let act_hwnd_val = state.activation_hwnd.load(Ordering::Relaxed);
+                if act_hwnd_val != 0 && act_hwnd_val != hwnd_val {
+                    let act_hwnd = act_hwnd_val as HWND;
+                    if unsafe { IsWindow(act_hwnd) != 0 && IsWindowVisible(act_hwnd) != 0 && IsIconic(act_hwnd) == 0 } {
+                        let mut act_rect = RECT { left: 0, top: 0, right: 0, bottom: 0 };
+                        if unsafe { GetWindowRect(act_hwnd, &mut act_rect) } != 0 {
+                            if pt.x >= act_rect.left
+                                && pt.x < act_rect.right
+                                && pt.y >= act_rect.top
+                                && pt.y < act_rect.bottom
+                            {
+                                if currently_interactive {
+                                    currently_interactive = false;
+                                    set_click_through_native(hwnd, true);
+                                }
+                                continue;
                             }
-                            continue;
+                        }
+                    }
+                }
+
+                // Check if cursor is over the native Settings window (obtained directly via Tauri WebviewWindow HWND)
+                let set_hwnd_val = state.settings_hwnd.load(Ordering::Relaxed);
+                if set_hwnd_val != 0 && set_hwnd_val != hwnd_val {
+                    let set_hwnd = set_hwnd_val as HWND;
+                    if unsafe { IsWindow(set_hwnd) != 0 && IsWindowVisible(set_hwnd) != 0 && IsIconic(set_hwnd) == 0 } {
+                        let mut settings_rect = RECT { left: 0, top: 0, right: 0, bottom: 0 };
+                        if unsafe { GetWindowRect(set_hwnd, &mut settings_rect) } != 0 {
+                            if pt.x >= settings_rect.left
+                                && pt.x < settings_rect.right
+                                && pt.y >= settings_rect.top
+                                && pt.y < settings_rect.bottom
+                            {
+                                if currently_interactive {
+                                    currently_interactive = false;
+                                    set_click_through_native(hwnd, true);
+                                }
+                                continue;
+                            }
                         }
                     }
                 }
@@ -281,7 +317,7 @@ pub fn position_at_top<R: Runtime>(window: &WebviewWindow<R>) {
         }));
         let _ = window.set_size(Size::Physical(PhysicalSize {
             width: screen_size.width,
-            height: screen_size.height,
+            height: screen_size.height.saturating_sub(2),
         }));
         let _ = window.show();
         let _ = window.unminimize();

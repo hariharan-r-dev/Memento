@@ -19,6 +19,7 @@ import { CharmPicker } from './components/Pickers/CharmPicker';
 import { PetPicker } from './components/Pickers/PetPicker';
 import { ritualEngine } from './rituals/ritualEngine';
 import { soundEffects } from './audio/soundEffects';
+import { useLicense } from './stores/licenseStore';
 
 // Helper to safely invoke Tauri commands
 const invokeTauri = async (cmd: string, args?: Record<string, unknown>) => {
@@ -35,6 +36,34 @@ const invokeTauri = async (cmd: string, args?: Record<string, unknown>) => {
 export const App: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { settings, updateSettings, resetAllSettings } = useSettings();
+  const { isActivated, isCharmOwned, getFirstOwnedCharmId } = useLicense();
+
+  // If unactivated, App does not render charm overlay and lets Rust handle windows
+
+  // Listen for activation completed event across windows
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    if (typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window) {
+      import('@tauri-apps/api/event').then(({ listen }) => {
+        listen('activation-completed', () => {
+          invokeTauri('show_main_window');
+        }).then((u) => {
+          unsub = u;
+        });
+      }).catch(() => {});
+    }
+    return () => {
+      if (unsub) unsub();
+    };
+  }, []);
+
+  // If activated and currently selected charm is not owned, switch to first owned charm
+  useEffect(() => {
+    if (isActivated && !isCharmOwned(settings.selectedCharm)) {
+      const firstOwned = getFirstOwnedCharmId();
+      updateSettings({ selectedCharm: firstOwned });
+    }
+  }, [isActivated, isCharmOwned, settings.selectedCharm, getFirstOwnedCharmId, updateSettings]);
 
   // Active Charm Definition from Registry
   const activeCharm = getCharmById(settings.selectedCharm);
@@ -446,6 +475,10 @@ export const App: React.FC = () => {
     soundEffects.playRitualSparkle();
   };
 
+  if (!isActivated) {
+    return null;
+  }
+
   if (!settings.showCharm && !settings.showPet) {
     return null;
   }
@@ -587,11 +620,13 @@ export const App: React.FC = () => {
         initialTab={settingsTab}
       />
 
-      {/* 10. Onboarding Modal for First Launch */}
-      <OnboardingModal
-        isOpen={!settings.hasCompletedOnboarding}
-        onHangItUp={handleCompleteOnboarding}
-      />
+      {/* 10. Onboarding Modal for First Launch after Activation */}
+      {!settings.hasCompletedOnboarding && (
+        <OnboardingModal
+          isOpen={!settings.hasCompletedOnboarding}
+          onHangItUp={handleCompleteOnboarding}
+        />
+      )}
     </div>
   );
 };

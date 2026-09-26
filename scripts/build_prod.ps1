@@ -1,4 +1,6 @@
-$ErrorActionPreference = "Stop"
+Write-Host "=== 0. Terminating old instances ==="
+Get-Process -Name "*memento*", "*Memento*", "*lucky*", "*Lucky*" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 500
 
 Write-Host "=== 1. Building Frontend ==="
 npm run build
@@ -21,20 +23,33 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "=== 3. Copying binaries to release-bin ==="
+Get-Process -Name "*memento*", "*Memento*", "*lucky*", "*Lucky*" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 500
+
 $targetRelease = "$env:TEMP\lucky-charm-target\release"
 $releaseBin = "D:\Hariharan R\Lucky charm\release-bin"
 New-Item -ItemType Directory -Path $releaseBin -Force | Out-Null
 
+# Check for Memento.exe or lucky_charm.exe
 $builtExe = "$targetRelease\lucky_charm.exe"
-if (Test-Path $builtExe) {
-    Copy-Item $builtExe "$releaseBin\Lucky-Charm.exe" -Force
-    Write-Host "Copied $builtExe -> $releaseBin\Lucky-Charm.exe"
+if (-not (Test-Path $builtExe)) {
+    $builtExe = "$targetRelease\Memento.exe"
+}
+if (-not (Test-Path $builtExe)) {
+    $builtExe = "$targetRelease\memento.exe"
 }
 
-$builtNsis = Get-ChildItem "$targetRelease\bundle\nsis\*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+if (Test-Path $builtExe) {
+    Copy-Item $builtExe "$releaseBin\Memento.exe" -Force
+    Copy-Item $builtExe "$releaseBin\Lucky-Charm.exe" -Force
+    Write-Host "Copied $builtExe -> $releaseBin\Memento.exe and $releaseBin\Lucky-Charm.exe"
+}
+
+$builtNsis = Get-ChildItem "$targetRelease\bundle\nsis\*.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($builtNsis) {
+    Copy-Item $builtNsis.FullName "$releaseBin\Memento-Setup.exe" -Force
     Copy-Item $builtNsis.FullName "$releaseBin\Lucky-Charm-Setup.exe" -Force
-    Write-Host "Copied $($builtNsis.FullName) -> $releaseBin\Lucky-Charm-Setup.exe"
+    Write-Host "Copied $($builtNsis.FullName) -> $releaseBin\Memento-Setup.exe and $releaseBin\Lucky-Charm-Setup.exe"
 }
 
 Write-Host "=== Build and packaging complete ==="

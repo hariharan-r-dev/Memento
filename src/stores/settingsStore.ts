@@ -58,11 +58,19 @@ export interface AppSettings {
 
 const STORAGE_KEY = 'lucky_charm_settings_v1';
 
-export const getDefaultAnchorX = () => {
-  if (typeof window !== 'undefined' && window.innerWidth > 300) {
-    return Math.round(window.innerWidth / 2);
+export const getEffectiveScreenWidth = (): number => {
+  if (typeof window !== 'undefined') {
+    const screenW = window.screen?.availWidth || window.screen?.width;
+    if (typeof screenW === 'number' && screenW > 300) {
+      return screenW;
+    }
   }
-  return 960;
+  return 1920;
+};
+
+export const getDefaultAnchorX = () => {
+  const screenW = getEffectiveScreenWidth();
+  return Math.round(screenW / 2);
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -119,8 +127,8 @@ export const getSavedSettings = (): AppSettings => {
       if (typeof parsed.charmSize === 'string') {
         parsed.charmSize = parsed.charmSize === 'small' ? 0.85 : parsed.charmSize === 'large' ? 1.25 : 1.0;
       }
-      // Defensive checks to guarantee visible charm
-      const screenW = typeof window !== 'undefined' && window.innerWidth > 300 ? window.innerWidth : 1920;
+      // Defensive checks to guarantee visible charm using physical display width (never local webview window width)
+      const screenW = getEffectiveScreenWidth();
       if (typeof parsed.anchorX !== 'number' || isNaN(parsed.anchorX) || parsed.anchorX < 40 || parsed.anchorX > screenW - 40) {
         parsed.anchorX = Math.round(screenW / 2);
       }

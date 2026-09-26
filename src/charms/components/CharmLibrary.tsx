@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import type { CharmCategory, CharmDefinition } from '../types';
 import { ALL_CHARMS } from '../registry';
 import { CharmCard } from './CharmCard';
+import { useLicense } from '../../stores/licenseStore';
 
 interface CharmLibraryProps {
   selectedCharmId: string;
@@ -13,6 +14,7 @@ export const CharmLibrary: React.FC<CharmLibraryProps> = ({
   onSelectCharm,
 }) => {
   const [activeCategory, setActiveCategory] = useState<CharmCategory>('all');
+  const { isCharmOwned, isActivated } = useLicense();
 
   const categories: { id: CharmCategory; label: string }[] = [
     { id: 'all', label: 'All' },
@@ -58,17 +60,25 @@ export const CharmLibrary: React.FC<CharmLibraryProps> = ({
 
       {/* Grid of Compact Charm Cards */}
       <div className="grid grid-cols-2 gap-2.5">
-        {filteredCharms.map((charm) => (
-          <CharmCard
-            key={charm.id}
-            charm={charm}
-            isSelected={
-              selectedCharmId === charm.id ||
-              (selectedCharmId === 'lucky-cat' && charm.id === 'maneki-neko')
-            }
-            onSelect={onSelectCharm}
-          />
-        ))}
+        {filteredCharms.map((charm) => {
+          const isOwned = !isActivated || isCharmOwned(charm.id);
+          return (
+            <CharmCard
+              key={charm.id}
+              charm={charm}
+              isSelected={
+                selectedCharmId === charm.id ||
+                (selectedCharmId === 'lucky-cat' && charm.id === 'maneki-neko')
+              }
+              isLocked={!isOwned}
+              onSelect={(selected) => {
+                if (isOwned) {
+                  onSelectCharm(selected);
+                }
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

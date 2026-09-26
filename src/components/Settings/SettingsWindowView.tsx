@@ -11,11 +11,16 @@ import {
   Keyboard,
   Info,
   RotateCcw,
+  KeyRound,
+  CheckCircle2,
+  LogOut,
+  ExternalLink,
 } from 'lucide-react';
 import { useSettings, DEFAULT_SETTINGS } from '../../stores/settingsStore';
 import type { AppSettings } from '../../stores/settingsStore';
 import { ALL_CHARMS } from '../../charms/registry';
 import { ALL_PETS } from '../../pets/registry';
+import { useLicense } from '../../stores/licenseStore';
 import {
   SettingRow,
   SettingToggle,
@@ -26,6 +31,7 @@ import './settings.css';
 
 export type SettingsTab =
   | 'general'
+  | 'license'
   | 'charms'
   | 'pets'
   | 'rope'
@@ -46,17 +52,42 @@ const emitTauri = async (event: string, payload?: unknown) => {
   } catch (_e) {}
 };
 
+// Safely invoke Tauri commands
+const invokeTauri = async (cmd: string, args?: Record<string, unknown>) => {
+  try {
+    if (typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window) {
+      const { invoke } = await import('@tauri-apps/api/core');
+      return await invoke(cmd, args);
+    }
+  } catch (e) {
+    console.error(`[invokeTauri] Error calling ${cmd}:`, e);
+  }
+};
+
 export const SettingsWindowView: React.FC = () => {
   const { settings, updateSettings, resetAllSettings } = useSettings();
+  const {
+    isActivated,
+    licenseKey,
+    plan,
+    planName,
+    entitlements,
+    ownedMementos,
+    deviceId,
+    deactivateLicense,
+    isCharmOwned,
+  } = useLicense();
   const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const tab = params.get('tab') as SettingsTab;
-      if (tab) return tab;
+      const tab = params.get('tab');
+      if (tab === 'appearance') return 'rope';
+      if (tab) return tab as SettingsTab;
     }
     return 'general';
   });
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [charmCategoryFilter, setCharmCategoryFilter] = useState<string>('all');
 
   // Ensure Settings Window document and root have full pointer-events interactivity
@@ -88,7 +119,8 @@ export const SettingsWindowView: React.FC = () => {
           const { listen } = await import('@tauri-apps/api/event');
           unlisten = await listen<string>('navigate-tab', (event) => {
             if (event.payload) {
-              setActiveTab(event.payload as SettingsTab);
+              const tab = event.payload === 'appearance' ? 'rope' : (event.payload as SettingsTab);
+              setActiveTab(tab);
             }
           });
         }
@@ -102,6 +134,7 @@ export const SettingsWindowView: React.FC = () => {
 
   const navItems: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
     { id: 'general', label: 'General', icon: <ShieldCheck style={{ width: 16, height: 16 }} /> },
+    { id: 'license', label: 'License & Plan', icon: <KeyRound style={{ width: 16, height: 16 }} /> },
     { id: 'charms', label: 'Charms', icon: <Palette style={{ width: 16, height: 16 }} /> },
     { id: 'pets', label: 'Pets', icon: <PawPrint style={{ width: 16, height: 16 }} /> },
     { id: 'rope', label: 'Rope', icon: <Cable style={{ width: 16, height: 16 }} /> },
@@ -220,6 +253,172 @@ export const SettingsWindowView: React.FC = () => {
         )}
 
         {/* ========================================================= */}
+        {/* TAB 2: LICENSE & PLAN */}
+        {/* ========================================================= */}
+        {activeTab === 'license' && (
+          <div>
+            <div className="settings-page-header">
+              <h1 className="settings-page-title">License & Plan</h1>
+              <p className="settings-page-desc">
+                View your active Memento license, plan details, and device status.
+              </p>
+            </div>
+
+            <SettingsSection title="Subscription & Plan">
+              <SettingRow
+                label="Plan Tier"
+                description={planName ? `Active entitlement: ${planName}` : 'No active license found.'}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {isActivated ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#FBBF24', fontSize: '12px', fontWeight: 600 }}>
+                      <CheckCircle2 style={{ width: 13, height: 13 }} />
+                      <span>{planName || 'Activated'}</span>
+                    </span>
+                  ) : (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#F87171', fontSize: '12px', fontWeight: 600 }}>
+                      Not Activated
+                    </span>
+                  )}
+                </div>
+              </SettingRow>
+
+              <SettingRow
+                label="Entitlements"
+                description="Customization & talisman capacity."
+              >
+                <span style={{ fontSize: '12px', color: '#94A3B8' }}>
+                  {entitlements?.customization ? 'Customization Enabled · ' : 'Standard Mode · '}
+                  {entitlements?.maxMementos ? `Up to ${entitlements.maxMementos} Mementos` : 'Standard'}
+                </span>
+              </SettingRow>
+
+              <SettingRow
+                label="License Key"
+                description="Assigned license key for this workstation."
+              >
+                <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '12px', color: '#CBD5E1', letterSpacing: '0.05em' }}>
+                  {licenseKey ? `${licenseKey.substring(0, 8)}••••••••${licenseKey.slice(-4)}` : '—'}
+                </span>
+              </SettingRow>
+
+              <SettingRow
+                label="Device ID"
+                description="Unique identifier for hardware binding."
+              >
+                <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '11px', color: '#64748B' }}>
+                  {deviceId}
+                </span>
+              </SettingRow>
+            </SettingsSection>
+
+            <SettingsSection title="Unlocked Mementos">
+              <div className="settings-card" style={{ padding: '12px 14px' }}>
+                <div style={{ fontSize: '12px', color: '#94A3B8', marginBottom: 8 }}>
+                  {plan === 'memento_complete'
+                    ? 'All 11 Mementos unlocked with your Complete plan.'
+                    : `You have ${ownedMementos.length} Mementos unlocked on this license.`}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {ALL_CHARMS.map((charm) => {
+                    const isOwned = !isActivated || (plan === 'memento_complete') || ownedMementos.includes(charm.id);
+                    return (
+                      <span
+                        key={charm.id}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          padding: '3px 8px',
+                          borderRadius: 6,
+                          fontSize: '11px',
+                          fontWeight: isOwned ? 600 : 400,
+                          backgroundColor: isOwned ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+                          color: isOwned ? '#FBBF24' : '#64748B',
+                          border: isOwned ? '1px solid rgba(245, 158, 11, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
+                        }}
+                      >
+                        {isOwned ? '✓' : '🔒'} {charm.name}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </SettingsSection>
+
+            {isActivated && (
+              <SettingsSection title="License Management">
+                <div className="settings-card">
+                  <div className="settings-row">
+                    <div className="settings-row-info">
+                      <div className="settings-row-title">Deactivate on this Device</div>
+                      <div className="settings-row-desc">
+                        Release this device binding to transfer your license to another machine.
+                      </div>
+                    </div>
+                    <div className="settings-row-control">
+                      {showDeactivateConfirm ? (
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await deactivateLicense();
+                              await invokeTauri('deactivate_license');
+                              setShowDeactivateConfirm(false);
+                              await invokeTauri('hide_main_window');
+                              await invokeTauri('open_activation_window');
+                            }}
+                            className="settings-button settings-button-danger"
+                          >
+                            Confirm Deactivate
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowDeactivateConfirm(false)}
+                            className="settings-button"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setShowDeactivateConfirm(true)}
+                          className="settings-button settings-button-danger"
+                        >
+                          <LogOut style={{ width: 13, height: 13 }} />
+                          <span>Deactivate</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </SettingsSection>
+            )}
+
+            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+              <a
+                href="https://buymemento.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  color: '#F59E0B',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+              >
+                <span>Manage Plan & Purchases on Website</span>
+                <ExternalLink style={{ width: 12, height: 12 }} />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
         {/* TAB 2: CHARMS */}
         {/* ========================================================= */}
         {activeTab === 'charms' && (
@@ -267,13 +466,18 @@ export const SettingsWindowView: React.FC = () => {
                   const isSelected =
                     settings.selectedCharm === charm.id ||
                     (settings.selectedCharm === 'lucky-cat' && charm.id === 'maneki-neko');
+                  const isOwned = !isActivated || (plan === 'memento_complete') || isCharmOwned(charm.id);
                   const ArtworkComponent = charm.artwork;
                   return (
                     <button
                       key={charm.id}
                       type="button"
-                      onClick={() => handleUpdate({ selectedCharm: charm.id })}
-                      className={`settings-item-card ${isSelected ? 'selected' : ''}`}
+                      onClick={() => {
+                        if (isOwned) {
+                          handleUpdate({ selectedCharm: charm.id });
+                        }
+                      }}
+                      className={`settings-item-card ${isSelected ? 'selected' : ''} ${!isOwned ? 'opacity-65' : ''}`}
                     >
                       <div className="card-preview">
                         <ArtworkComponent
@@ -289,7 +493,7 @@ export const SettingsWindowView: React.FC = () => {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="card-name">{charm.name}</div>
                           <div className="card-tag">
-                            {charm.category.charAt(0).toUpperCase() + charm.category.slice(1)} · {charm.region}
+                            {charm.category.charAt(0).toUpperCase() + charm.category.slice(1)} · {charm.region} {!isOwned && '· 🔒 Locked'}
                           </div>
                         </div>
                         {isSelected && <span className="card-check">✓</span>}
