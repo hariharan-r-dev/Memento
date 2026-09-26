@@ -434,6 +434,8 @@ export const SettingsWindowView: React.FC = () => {
             <div className="settings-tab-pills">
               {[
                 { id: 'all', label: 'All' },
+                { id: 'food', label: 'Food' },
+                { id: 'marvel', label: 'Marvel' },
                 { id: 'devotional', label: 'Devotional' },
                 { id: 'cultural', label: 'Cultural' },
                 { id: 'cars', label: 'Cars' },

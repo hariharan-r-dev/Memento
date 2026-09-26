@@ -18,6 +18,8 @@ export const CharmLibrary: React.FC<CharmLibraryProps> = ({
 
   const categories: { id: CharmCategory; label: string }[] = [
     { id: 'all', label: 'All' },
+    { id: 'food', label: 'Food' },
+    { id: 'marvel', label: 'Marvel' },
     { id: 'cultural', label: 'Cultural' },
     { id: 'devotional', label: 'Devotional' },
     { id: 'protection', label: 'Protection' },

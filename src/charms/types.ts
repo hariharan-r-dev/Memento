@@ -9,7 +9,9 @@ export type CharmCategory =
   | 'goals'
   | 'cultural'
   | 'devotional'
-  | 'cars';
+  | 'cars'
+  | 'marvel'
+  | 'food';
 
 export interface CharmArtworkProps {
   scale?: number;
@@ -25,7 +27,7 @@ export interface CharmDefinition {
   id: string;
   name: string;
   shortDescription: string;
-  category: 'protection' | 'prosperity' | 'calm' | 'goals' | 'cultural' | 'devotional' | 'cars';
+  category: 'protection' | 'prosperity' | 'calm' | 'goals' | 'cultural' | 'devotional' | 'cars' | 'marvel' | 'food';
   region: string;
   culturalContext: string;
   tags: string[];
@@ -74,5 +76,15 @@ export type CharmId =
   | 'daruma'
   | 'lucky-coin'
   | 'bell'
-  | 'venkateswara';
+  | 'venkateswara'
+  | 'kandhan-karunai'
+  | 'red-car'
+  | 'iron-man'
+  | 'croissant'
+  | 'chocolate-strawberry'
+  | 'chocolate-milkshake'
+  | 'pistachio-chocolate-donut'
+  | 'matcha-drink'
+  | 'matcha'
+  | 'disco-ball-stars';
 

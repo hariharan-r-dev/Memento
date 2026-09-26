@@ -26,6 +26,8 @@ export const CharmPicker: React.FC<CharmPickerProps> = ({
 
   const categories: { id: string; label: string }[] = [
     { id: 'all', label: 'All' },
+    { id: 'food', label: 'Food' },
+    { id: 'marvel', label: 'Marvel' },
     { id: 'devotional', label: 'Devotional' },
     { id: 'cultural', label: 'Cultural' },
     { id: 'cars', label: 'Cars' },
