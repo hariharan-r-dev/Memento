@@ -1,6 +1,6 @@
 [package]
 name = "lucky_charm"
-version = "0.1.0"
+version = "1.0.2"
 description = "A little bit of luck, hanging from your screen."
 authors = ["Lucky Charm Team"]
 edition = "2021"
