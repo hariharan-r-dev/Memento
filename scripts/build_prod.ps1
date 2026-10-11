@@ -78,7 +78,21 @@ if (Test-Path "D:\Applications\Memento") {
         Copy-Item $builtExe "D:\Applications\Memento\lucky_charm.exe" -Force
         Copy-Item $builtExe "D:\Applications\Memento\Memento.exe" -Force
     }
+    if ($builtNsis) {
+        Copy-Item $builtNsis.FullName "D:\Applications\Memento\Memento-Setup.exe" -Force
+    }
+    if ($builtMsi) {
+        Copy-Item $builtMsi.FullName "D:\Applications\Memento\Memento.msi" -Force
+    }
     Write-Host "Updated D:\Applications\Memento"
 }
 
+if (Test-Path "D:\Applications") {
+    if ($builtNsis) {
+        Copy-Item $builtNsis.FullName "D:\Applications\Memento-Setup.exe" -Force
+        Write-Host "Updated D:\Applications\Memento-Setup.exe"
+    }
+}
+
 Write-Host "=== Build and packaging complete ==="
+
