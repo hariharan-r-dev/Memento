@@ -3,6 +3,7 @@ import type { CharmCategory, CharmDefinition } from '../types';
 import { ALL_CHARMS } from '../registry';
 import { CharmCard } from './CharmCard';
 import { useLicense } from '../../stores/licenseStore';
+import { IS_FREE_LAUNCH } from '../../config/features';
 
 interface CharmLibraryProps {
   selectedCharmId: string;
@@ -63,7 +64,7 @@ export const CharmLibrary: React.FC<CharmLibraryProps> = ({
       {/* Grid of Compact Charm Cards */}
       <div className="grid grid-cols-2 gap-2.5">
         {filteredCharms.map((charm) => {
-          const isOwned = !isActivated || isCharmOwned(charm.id);
+          const isOwned = IS_FREE_LAUNCH || !isActivated || isCharmOwned(charm.id);
           return (
             <CharmCard
               key={charm.id}

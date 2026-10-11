@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { X, Sparkles, Lock, AlertCircle } from 'lucide-react';
 import { ALL_CHARMS } from '../../charms/registry';
 import type { CharmDefinition } from '../../charms/types';
+import { CharmPreview } from '../../charms/components/CharmPreview';
 import { soundEffects } from '../../audio/soundEffects';
 import { useLicense } from '../../stores/licenseStore';
+import { IS_FREE_LAUNCH } from '../../config/features';
 
 interface CharmPickerProps {
   isOpen: boolean;
@@ -46,7 +48,7 @@ export const CharmPicker: React.FC<CharmPickerProps> = ({
   });
 
   const handleSelect = (charm: CharmDefinition) => {
-    const owned = !isActivated || isCharmOwned(charm.id);
+    const owned = IS_FREE_LAUNCH || !isActivated || isCharmOwned(charm.id);
     if (!owned) {
       setLockedNotice(`"${charm.name}" is not included in your ${planName || 'current'} plan.`);
       setTimeout(() => setLockedNotice(null), 3500);
@@ -100,7 +102,7 @@ export const CharmPicker: React.FC<CharmPickerProps> = ({
         </div>
 
         {/* Locked Notice Banner */}
-        {lockedNotice && (
+        {!IS_FREE_LAUNCH && lockedNotice && (
           <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-[11px] flex items-center justify-between animate-in fade-in duration-150">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -121,8 +123,7 @@ export const CharmPicker: React.FC<CharmPickerProps> = ({
         <div className="p-4 grid grid-cols-4 gap-2.5 max-h-[340px] overflow-y-auto">
           {filteredCharms.map((charm) => {
             const isSelected = selectedCharmId === charm.id || (selectedCharmId === 'lucky-cat' && charm.id === 'maneki-neko');
-            const isOwned = !isActivated || isCharmOwned(charm.id);
-            const ArtworkComponent = charm.artwork;
+            const isOwned = IS_FREE_LAUNCH || !isActivated || isCharmOwned(charm.id);
 
             return (
               <button
@@ -145,16 +146,14 @@ export const CharmPicker: React.FC<CharmPickerProps> = ({
                 )}
 
                 {/* Centered Dimensional Artwork Preview */}
-                <div className={`relative w-full h-[76px] flex items-center justify-center my-0.5 pointer-events-none transition-transform duration-150 group-hover:scale-105 ${!isOwned ? 'grayscale-[35%]' : ''}`}>
-                  <ArtworkComponent
-                    scale={0.62}
-                    angle={0}
-                    isHovered={isSelected}
-                    isRitual={false}
-                    pawWavePhase={1.0}
-                    bellJingle={0.4}
-                  />
-                </div>
+                <CharmPreview
+                  charm={charm}
+                  isSelected={isSelected}
+                  isLocked={!isOwned}
+                  containerHeight={76}
+                  maxHeight={64}
+                  maxWidth={82}
+                />
 
                 {/* Name & Region */}
                 <div className="w-full text-center mt-1 pt-1.5 border-t border-white/[0.05] shrink-0">

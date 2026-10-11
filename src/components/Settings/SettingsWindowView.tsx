@@ -20,7 +20,9 @@ import { useSettings, DEFAULT_SETTINGS } from '../../stores/settingsStore';
 import type { AppSettings } from '../../stores/settingsStore';
 import { ALL_CHARMS } from '../../charms/registry';
 import { ALL_PETS } from '../../pets/registry';
+import { CharmPreview } from '../../charms/components/CharmPreview';
 import { useLicense } from '../../stores/licenseStore';
+import { IS_FREE_LAUNCH } from '../../config/features';
 import {
   SettingRow,
   SettingToggle,
@@ -82,6 +84,7 @@ export const SettingsWindowView: React.FC = () => {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
       if (tab === 'appearance') return 'rope';
+      if (tab === 'license' && IS_FREE_LAUNCH) return 'general';
       if (tab) return tab as SettingsTab;
     }
     return 'general';
@@ -120,7 +123,11 @@ export const SettingsWindowView: React.FC = () => {
           unlisten = await listen<string>('navigate-tab', (event) => {
             if (event.payload) {
               const tab = event.payload === 'appearance' ? 'rope' : (event.payload as SettingsTab);
-              setActiveTab(tab);
+              if (tab === 'license' && IS_FREE_LAUNCH) {
+                setActiveTab('general');
+              } else {
+                setActiveTab(tab);
+              }
             }
           });
         }
@@ -134,7 +141,9 @@ export const SettingsWindowView: React.FC = () => {
 
   const navItems: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
     { id: 'general', label: 'General', icon: <ShieldCheck style={{ width: 16, height: 16 }} /> },
-    { id: 'license', label: 'License & Plan', icon: <KeyRound style={{ width: 16, height: 16 }} /> },
+    ...(!IS_FREE_LAUNCH
+      ? [{ id: 'license' as SettingsTab, label: 'License & Plan', icon: <KeyRound style={{ width: 16, height: 16 }} /> }]
+      : []),
     { id: 'charms', label: 'Charms', icon: <Palette style={{ width: 16, height: 16 }} /> },
     { id: 'pets', label: 'Pets', icon: <PawPrint style={{ width: 16, height: 16 }} /> },
     { id: 'rope', label: 'Rope', icon: <Cable style={{ width: 16, height: 16 }} /> },
@@ -255,7 +264,7 @@ export const SettingsWindowView: React.FC = () => {
         {/* ========================================================= */}
         {/* TAB 2: LICENSE & PLAN */}
         {/* ========================================================= */}
-        {activeTab === 'license' && (
+        {activeTab === 'license' && !IS_FREE_LAUNCH && (
           <div>
             <div className="settings-page-header">
               <h1 className="settings-page-title">License & Plan</h1>
@@ -468,8 +477,7 @@ export const SettingsWindowView: React.FC = () => {
                   const isSelected =
                     settings.selectedCharm === charm.id ||
                     (settings.selectedCharm === 'lucky-cat' && charm.id === 'maneki-neko');
-                  const isOwned = !isActivated || (plan === 'memento_complete') || isCharmOwned(charm.id);
-                  const ArtworkComponent = charm.artwork;
+                  const isOwned = IS_FREE_LAUNCH || !isActivated || (plan === 'memento_complete') || isCharmOwned(charm.id);
                   return (
                     <button
                       key={charm.id}
@@ -479,18 +487,16 @@ export const SettingsWindowView: React.FC = () => {
                           handleUpdate({ selectedCharm: charm.id });
                         }
                       }}
-                      className={`settings-item-card ${isSelected ? 'selected' : ''} ${!isOwned ? 'opacity-65' : ''}`}
+                      className={`settings-item-card group ${isSelected ? 'selected' : ''} ${!isOwned ? 'opacity-65' : ''}`}
                     >
-                      <div className="card-preview">
-                        <ArtworkComponent
-                          scale={0.62}
-                          angle={0}
-                          isHovered={isSelected}
-                          isRitual={false}
-                          pawWavePhase={1.0}
-                          bellJingle={0.4}
-                        />
-                      </div>
+                      <CharmPreview
+                        charm={charm}
+                        isSelected={isSelected}
+                        isLocked={!isOwned}
+                        containerHeight={84}
+                        maxHeight={72}
+                        maxWidth={96}
+                      />
                       <div className="card-footer">
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="card-name">{charm.name}</div>

@@ -52,4 +52,33 @@ if ($builtNsis) {
     Write-Host "Copied $($builtNsis.FullName) -> $releaseBin\Memento-Setup.exe and $releaseBin\Lucky-Charm-Setup.exe"
 }
 
+$builtMsi = Get-ChildItem "$targetRelease\bundle\msi\*.msi" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+if ($builtMsi) {
+    Copy-Item $builtMsi.FullName "$releaseBin\Lucky-Charm.msi" -Force
+    Copy-Item $builtMsi.FullName "$releaseBin\Memento.msi" -Force
+    Write-Host "Copied $($builtMsi.FullName) -> $releaseBin\Lucky-Charm.msi and $releaseBin\Memento.msi"
+}
+
+# Update installed application directories if present
+if (Test-Path "D:\Applications\Lucky Charm") {
+    if (Test-Path $builtExe) {
+        Copy-Item $builtExe "D:\Applications\Lucky Charm\Lucky-Charm.exe" -Force
+    }
+    if ($builtNsis) {
+        Copy-Item $builtNsis.FullName "D:\Applications\Lucky Charm\Lucky-Charm-Setup.exe" -Force
+    }
+    if ($builtMsi) {
+        Copy-Item $builtMsi.FullName "D:\Applications\Lucky Charm\Lucky-Charm.msi" -Force
+    }
+    Write-Host "Updated D:\Applications\Lucky Charm"
+}
+
+if (Test-Path "D:\Applications\Memento") {
+    if (Test-Path $builtExe) {
+        Copy-Item $builtExe "D:\Applications\Memento\lucky_charm.exe" -Force
+        Copy-Item $builtExe "D:\Applications\Memento\Memento.exe" -Force
+    }
+    Write-Host "Updated D:\Applications\Memento"
+}
+
 Write-Host "=== Build and packaging complete ==="

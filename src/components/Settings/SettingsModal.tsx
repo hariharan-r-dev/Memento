@@ -16,6 +16,7 @@ import {
 import type { AppSettings } from '../../stores/settingsStore';
 import { ALL_CHARMS } from '../../charms/registry';
 import { ALL_PETS } from '../../pets/registry';
+import { CharmPreview } from '../../charms/components/CharmPreview';
 import {
   SettingRow,
   SettingToggle,
@@ -260,22 +261,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       const isSelected =
                         settings.selectedCharm === charm.id ||
                         (settings.selectedCharm === 'lucky-cat' && charm.id === 'maneki-neko');
-                      const ArtworkComponent = charm.artwork;
                       return (
                         <button
                           key={charm.id}
                           type="button"
                           onClick={() => onUpdate({ selectedCharm: charm.id })}
-                          className={`settings-item-card ${isSelected ? 'selected' : ''}`}
+                          className={`settings-item-card group ${isSelected ? 'selected' : ''}`}
                         >
-                          <div className="card-preview">
-                            <ArtworkComponent
-                              scale={0.56}
-                              angle={0}
-                              isHovered={isSelected}
-                              isRitual={false}
-                            />
-                          </div>
+                          <CharmPreview
+                            charm={charm}
+                            isSelected={isSelected}
+                            containerHeight={84}
+                            maxHeight={72}
+                            maxWidth={96}
+                          />
                           <div className="card-footer">
                             <div>
                               <div className="card-name">{charm.name}</div>

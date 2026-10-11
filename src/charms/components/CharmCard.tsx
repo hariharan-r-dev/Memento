@@ -1,6 +1,7 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
 import type { CharmDefinition } from '../types';
+import { CharmPreview } from './CharmPreview';
 
 interface CharmCardProps {
   charm: CharmDefinition;
@@ -15,8 +16,6 @@ export const CharmCard: React.FC<CharmCardProps> = ({
   isLocked = false,
   onSelect,
 }) => {
-  const ArtworkComponent = charm.artwork;
-
   return (
     <button
       type="button"
@@ -36,17 +35,15 @@ export const CharmCard: React.FC<CharmCardProps> = ({
         </div>
       )}
 
-      {/* Large Centered Artwork */}
-      <div className={`relative w-full h-[88px] flex items-center justify-center my-0.5 pointer-events-none transition-transform duration-150 group-hover:scale-105 ${isLocked ? 'grayscale-[40%]' : ''}`}>
-        <ArtworkComponent
-          scale={0.68}
-          angle={0}
-          isHovered={isSelected}
-          isRitual={false}
-          pawWavePhase={1.0}
-          bellJingle={0.5}
-        />
-      </div>
+      {/* Large Centered Contained Artwork */}
+      <CharmPreview
+        charm={charm}
+        isSelected={isSelected}
+        isLocked={isLocked}
+        containerHeight={84}
+        maxHeight={72}
+        maxWidth={96}
+      />
 
       {/* Name and Minimal Tagline */}
       <div className="w-full text-left mt-1.5 pt-1.5 border-t border-white/[0.05] shrink-0">

@@ -102,6 +102,11 @@ fn perform_ritual(app: tauri::AppHandle) {
   }
 }
 
+/// Configuration flag for promotional free launch mode.
+/// When true, licensing activation screens and tray activation items are temporarily disabled.
+/// When false, full licensing, verification, and activation UI are restored.
+pub const IS_FREE_LAUNCH: bool = true;
+
 #[derive(serde::Serialize, serde::Deserialize, Default, Clone, Debug)]
 pub struct StoredLicense {
   pub is_activated: bool,
@@ -635,7 +640,7 @@ pub fn run() {
       if let Some(window) = app.get_webview_window("main") {
         append_log("3.1 setup_window main");
         platform::setup_window(&window, hit_test_state);
-        if !activated {
+        if !IS_FREE_LAUNCH && !activated {
           append_log("3.2 not activated: hiding main window and opening activation window");
           let _ = window.hide();
           let _ = window.set_always_on_top(false);
@@ -645,25 +650,34 @@ pub fn run() {
 
       // 2. Setup System Tray Menu
       append_log("4. building tray menu items");
-      if let (Ok(show_hide_item), Ok(ritual_item), Ok(choose_charm_item), Ok(activate_item), Ok(reset_item), Ok(settings_item), Ok(quit_item)) = (
+      if let (Ok(show_hide_item), Ok(ritual_item), Ok(choose_charm_item), Ok(reset_item), Ok(settings_item), Ok(quit_item)) = (
         MenuItemBuilder::with_id("show_hide", "Show / Hide").build(app),
         MenuItemBuilder::with_id("ritual", "Lucky Ritual").build(app),
         MenuItemBuilder::with_id("choose_charm", "Choose Charm").build(app),
-        MenuItemBuilder::with_id("activate", "Activate License").build(app),
         MenuItemBuilder::with_id("reset", "Reset Position").build(app),
         MenuItemBuilder::with_id("settings", "Settings").build(app),
         MenuItemBuilder::with_id("quit", "Quit Memento").build(app),
       ) {
+        let activate_item = if !IS_FREE_LAUNCH {
+          MenuItemBuilder::with_id("activate", "Activate License").build(app).ok()
+        } else {
+          None
+        };
+
+        let mut menu_items: Vec<&dyn tauri::menu::IsMenuItem<_>> = vec![
+          &show_hide_item,
+          &ritual_item,
+          &choose_charm_item,
+        ];
+        if let Some(ref act) = activate_item {
+          menu_items.push(act);
+        }
+        menu_items.push(&reset_item);
+        menu_items.push(&settings_item);
+        menu_items.push(&quit_item);
+
         if let Ok(tray_menu) = MenuBuilder::new(app)
-          .items(&[
-            &show_hide_item,
-            &ritual_item,
-            &choose_charm_item,
-            &activate_item,
-            &reset_item,
-            &settings_item,
-            &quit_item,
-          ])
+          .items(&menu_items)
           .build()
         {
           append_log("5. building tray icon");

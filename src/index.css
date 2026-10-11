@@ -259,3 +259,18 @@ button {
 
 .translate-x-0 { transform: translateX(0); }
 .translate-x-4 { transform: translateX(1rem); }
+
+/* Charm Card Preview Containment */
+.charm-preview-viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.charm-preview-viewport .charm-artwork {
+  transform-origin: center center !important;
+}

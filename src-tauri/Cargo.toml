@@ -1,6 +1,6 @@
 [package]
 name = "lucky_charm"
-version = "1.0.2"
+version = "1.0.3"
 description = "A little bit of luck, hanging from your screen."
 authors = ["Memento Team"]
 edition = "2021"

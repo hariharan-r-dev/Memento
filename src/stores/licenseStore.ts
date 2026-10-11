@@ -9,6 +9,9 @@ import {
   type LicenseEntitlements,
 } from '../services/licenseService';
 import { ALL_CHARMS } from '../charms/registry';
+import { IS_FREE_LAUNCH } from '../config/features';
+
+export { IS_FREE_LAUNCH };
 
 export interface LicenseState {
   isActivated: boolean;
@@ -38,6 +41,21 @@ const getInitialState = (): LicenseState => {
       ownedMementos: stored.ownedMementos || [],
       deviceId,
       activatedAt: stored.activatedAt,
+      activationError: null,
+    };
+  }
+
+  if (IS_FREE_LAUNCH) {
+    return {
+      isActivated: true,
+      isActivating: false,
+      licenseKey: null,
+      plan: 'free_launch',
+      planName: 'Free Launch Edition',
+      entitlements: { maxMementos: 99, customization: true },
+      ownedMementos: [],
+      deviceId,
+      activatedAt: null,
       activationError: null,
     };
   }
@@ -153,21 +171,11 @@ export const useLicense = () => {
         await invoke('deactivate_license');
       } catch (_e) {}
     }
-    setLicenseState({
-      isActivated: false,
-      isActivating: false,
-      licenseKey: null,
-      plan: null,
-      planName: null,
-      entitlements: null,
-      ownedMementos: [],
-      deviceId: getOrCreateDeviceId(),
-      activatedAt: null,
-      activationError: null,
-    });
+    setLicenseState(getInitialState());
   }, []);
 
   const isCharmOwned = useCallback((charmId: string): boolean => {
+    if (IS_FREE_LAUNCH) return true;
     if (!licenseState.isActivated) return false;
     if (licenseState.plan === 'memento_complete' || (licenseState.entitlements && licenseState.entitlements.maxMementos >= 10)) {
       return true;

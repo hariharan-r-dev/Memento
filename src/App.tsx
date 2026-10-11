@@ -20,6 +20,7 @@ import { PetPicker } from './components/Pickers/PetPicker';
 import { ritualEngine } from './rituals/ritualEngine';
 import { soundEffects } from './audio/soundEffects';
 import { useLicense } from './stores/licenseStore';
+import { IS_FREE_LAUNCH } from './config/features';
 
 // Helper to safely invoke Tauri commands
 const invokeTauri = async (cmd: string, args?: Record<string, unknown>) => {
@@ -475,7 +476,7 @@ export const App: React.FC = () => {
     soundEffects.playRitualSparkle();
   };
 
-  if (!isActivated) {
+  if (!IS_FREE_LAUNCH && !isActivated) {
     return null;
   }
 

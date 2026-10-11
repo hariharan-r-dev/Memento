@@ -357,6 +357,7 @@
   position: relative;
   text-align: left;
   outline: none;
+  overflow: hidden;
 }
 
 .settings-item-card:hover {
@@ -372,11 +373,29 @@
 
 .settings-item-card .card-preview {
   width: 100%;
-  height: 80px;
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Constrain all charm preview viewports and ensure centered transform origins */
+.charm-preview-viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.charm-preview-viewport .charm-artwork,
+.card-preview .charm-artwork {
+  transform-origin: center center !important;
 }
 
 .settings-item-card .card-footer {
